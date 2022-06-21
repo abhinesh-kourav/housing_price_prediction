@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import find_packages, setup
 from typing import List
 
 REQUIREMENTS_FILENAME = 'requirements.txt'
@@ -11,13 +11,13 @@ def get_requirements_list()->List[str]:
     returns a list of all library names needed to be installed to run the app.
     """
     with open(REQUIREMENTS_FILENAME, 'r') as requirements_file:
-        return requirements_file.readlines()
+        return requirements_file.readlines().remove('-e .')
 
 setup(
     name = 'housing-price-predictor',
-    version='0.0.1',
+    version='0.0.2',
     author='Abhinesh Kourav',
     description='This is the first FSDS ML project',
-    packages=['housing'],
+    packages=find_packages(),
     install_requires = get_requirements_list()
 )
