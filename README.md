@@ -90,3 +90,8 @@ Tos stop docker conatiner
 ```
 docker stop <container_id>
 ```
+
+To install all libraries
+```
+python setup.py install
+```
