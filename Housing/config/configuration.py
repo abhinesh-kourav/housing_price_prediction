@@ -1,6 +1,6 @@
 import sys,os
 from housing.entity.config_entity import DataInjectionConfig, DataValidationConfig, DataTransformationConfig,\
-ModelTrainerConfig, ModelEvaluationConfig, ModelPusherCOnfig, TrainingPipelineConfig
+ModelTrainerConfig, ModelEvaluationConfig, ModelPusherConfig, TrainingPipelineConfig
 from housing.util.util import read_yaml_file
 from housing.constants import *
 from housing.exception import HousingException
@@ -11,12 +11,47 @@ class Configuration():
                 config_file_path:str = CONFIG_FILE_PATH,
                 current_time_stamp:str = CURRENT_TIME_STAMP
                 ) -> None:
-        self.config_info = read_yaml_file(config_file_path)
-        self.training_pipeline_config = self.get_training_pipeline_config()
-        self.time_stamp = current_time_stamp
+        try:
+            self.config_info = read_yaml_file(config_file_path)
+            self.training_pipeline_config = self.get_training_pipeline_config()
+            self.time_stamp = current_time_stamp
+        except Exception as e:
+            raise HousingException(e, sys) from e
 
     def get_data_ingestion_config(self) -> DataInjectionConfig:
-        pass
+        try:
+            artifact_dir = self.training_pipeline_config.artifact_dir
+            data_ingestion_artifact_dir = os.path.join(artifact_dir,
+                                            DATA_INGESTION_ARTIFACT_DIR,
+                                            self.time_stamp)
+
+            data_ingestion_config = self.config_info[DATA_INGESTION_CONFIG_KEY]
+            dataset_download_url = data_ingestion_config[DATA_INGESTION_DOWNLOAD_URL_KEY]
+            tgz_download_dir = os.path.join(data_ingestion_artifact_dir,
+                                data_ingestion_config[DATA_INGESTION_TGZ_DOWNLOAD_DIR_KEY])
+            raw_data_dir = os.path.join(data_ingestion_artifact_dir,
+                            data_ingestion_config[DATA_INGESTION_RAW_DATA_DIR_KEY])
+
+            ingested_dir = os.path.join(data_ingestion_artifact_dir,
+                            data_ingestion_config[DATA_INGESTION_INGESTED_DIR_NAME_KEY])
+            ingested_train_dir = os.path.join(ingested_dir,
+                                data_ingestion_config[DATA_INGESTION_TRAIN_DIR_KEY])
+            ingested_test_dir = os.path.join(ingested_dir,
+                                data_ingestion_config[DATA_INGESTION_TEST_DIR_KEY])
+
+            data_ingestion_config = DataInjectionConfig(
+                                    dataset_download_url=dataset_download_url, 
+                                    tgz_download_dir=tgz_download_dir, 
+                                    raw_data_dir=raw_data_dir, 
+                                    ingested_train_dir=ingested_train_dir, 
+                                    ingested_test_dir=ingested_test_dir
+            )
+            logging.info(f'DataInjectionConfig: {data_ingestion_config}')
+            return data_ingestion_config
+        
+        except Exception as e:
+            raise HousingException(e,sys) from e
+
 
     def get_data_validation_config(self) -> DataValidationConfig:
         pass
@@ -30,7 +65,7 @@ class Configuration():
     def get_model_evaluation_config(self)-> ModelEvaluationConfig:
         pass
 
-    def get_model_pusher_config(self)->ModelPusherCOnfig:
+    def get_model_pusher_config(self)->ModelPusherConfig:
         pass
 
     def get_training_pipeline_config(self)->TrainingPipelineConfig:
@@ -41,8 +76,6 @@ class Configuration():
                                     training_pipeline_config[TRAINING_PIPELINE_ARTIFACT_DIR_KEY])
             training_pipeline_config = TrainingPipelineConfig(artifact_dir=artifact_dir)
             logging.info(f"Training pipeling config: {training_pipeline_config}")
+            return training_pipeline_config
         except Exception as e:
             raise HousingException(e,sys) from e
-
-
-
