@@ -1,5 +1,5 @@
 import sys,os
-from housing.entity.config_entity import DataInjectionConfig, DataValidationConfig, DataTransformationConfig,\
+from housing.entity.config_entity import DataInjestionConfig, DataValidationConfig, DataTransformationConfig,\
 ModelTrainerConfig, ModelEvaluationConfig, ModelPusherConfig, TrainingPipelineConfig
 from housing.util.util import read_yaml_file
 from housing.constants import *
@@ -18,7 +18,7 @@ class Configuration():
         except Exception as e:
             raise HousingException(e, sys) from e
 
-    def get_data_ingestion_config(self) -> DataInjectionConfig:
+    def get_data_ingestion_config(self) -> DataInjestionConfig:
         try:
             artifact_dir = self.training_pipeline_config.artifact_dir
             data_ingestion_artifact_dir = os.path.join(artifact_dir,
@@ -39,14 +39,14 @@ class Configuration():
             ingested_test_dir = os.path.join(ingested_dir,
                                 data_ingestion_config[DATA_INGESTION_TEST_DIR_KEY])
 
-            data_ingestion_config = DataInjectionConfig(
+            data_ingestion_config = DataInjestionConfig(
                                     dataset_download_url=dataset_download_url, 
                                     tgz_download_dir=tgz_download_dir, 
                                     raw_data_dir=raw_data_dir, 
                                     ingested_train_dir=ingested_train_dir, 
                                     ingested_test_dir=ingested_test_dir
             )
-            logging.info(f'DataInjectionConfig: {data_ingestion_config}')
+            logging.info(f'DataInjestionConfig: {data_ingestion_config}')
             return data_ingestion_config
         
         except Exception as e:
