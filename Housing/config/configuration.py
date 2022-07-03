@@ -6,7 +6,7 @@ from housing.constants import *
 from housing.exception import HousingException
 from housing.logger import logging
 
-class Configuration():
+class Configuration:
     def __init__(self,
                 config_file_path:str = CONFIG_FILE_PATH,
                 current_time_stamp:str = CURRENT_TIME_STAMP
@@ -81,7 +81,7 @@ class Configuration():
             transformed_train_dir = os.path.join(
                                     transformed_dir,
                                     data_transformation_info[DATA_TRANSFORMATION_TRANSFORMED_TRAIN_DIR_KEY])
-            transform_test_dir = os.path.join(
+            transformed_test_dir = os.path.join(
                                 transformed_dir,
                                 data_transformation_info[DATA_TRANSFORMATION_TRANSFORMED_TEST_DIR_KEY])
             preprocessed_object_file_path = os.path.join(
@@ -91,7 +91,7 @@ class Configuration():
             data_transformation_config = DataTransformationConfig(
                                         add_bedroom_per_room= add_bedroom_per_room,
                                         transformed_train_dir= transformed_train_dir,
-                                        transform_test_dir= transform_test_dir,
+                                        transformed_test_dir= transformed_test_dir,
                                         preprocessed_object_file_path= preprocessed_object_file_path)
             logging.info(f"DataTransformationConfig: {data_transformation_config}")
             return data_transformation_config
@@ -133,7 +133,7 @@ class Configuration():
         except Exception as e:
             raise HousingException(e,sys) from e
 
-    def get_model_pusher_config(self)->ModelPusherConfig:
+    def get_model_pusher_config(self)-> ModelPusherConfig:
         try:
             artifact_dir = self.training_pipeline_config.artifact_dir
             model_pusher_info = self.config_info[MODEL_PUSHER_CONFIG_KEY]
