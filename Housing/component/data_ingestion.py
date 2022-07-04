@@ -1,4 +1,3 @@
-from tkinter import E
 from housing.entity.config_entity import DataInjestionConfig
 from housing.exception import HousingException
 import sys, os
