@@ -12,3 +12,10 @@ DataValidationArtifact = namedtuple('DataValidationArtifact',
                                     "report_page_file_path",
                                     "is_validated",
                                     "message"])
+
+DataTransformationArtifact = namedtuple('DataTransformationArtifact',
+                                        ["transformed_train_file_path",
+                                        "transformed_test_file_path",
+                                        "preprocessed_object_file_path",
+                                        "is_transformed",
+                                        "message"])
