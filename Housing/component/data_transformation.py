@@ -122,8 +122,8 @@ class DataTransformation:
             y_test = test_df[[target_column]]
             logging.info("Transforming input features using preprocessing object file.")
             X_train_arr = preprocessing_obj.fit_transform(X_train)
-            X_test_arr = preprocessing_obj.fit_transform(X_test)
-            logging.info("Concatenating transformed input features with putput features")
+            X_test_arr = preprocessing_obj.transform(X_test)
+            logging.info("Concatenating transformed input features with output features")
             train_arr = np.c_[X_train_arr, np.array(y_train)]
             test_arr = np.c_[X_test_arr, np.array(y_test)]
             logging.info("Saving transformed train and test datasets")

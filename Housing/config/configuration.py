@@ -1,6 +1,5 @@
 import sys,os
-from housing.entity.config_entity import DataInjestionConfig, DataValidationConfig, DataTransformationConfig,\
-ModelTrainerConfig, ModelEvaluationConfig, ModelPusherConfig, TrainingPipelineConfig
+from housing.entity.config_entity import DataInjestionConfig, DataValidationConfig, DataTransformationConfig, ModelTrainerConfig, ModelEvaluationConfig, ModelPusherConfig, TrainingPipelineConfig
 from housing.util.util import read_yaml_file
 from housing.constants import *
 from housing.exception import HousingException
@@ -9,7 +8,7 @@ from housing.logger import logging
 class Configuration:
     def __init__(self,
                 config_file_path:str = CONFIG_FILE_PATH,
-                current_time_stamp:str = CURRENT_TIME_STAMP
+                current_time_stamp:str = get_current_time_stamp()
                 ) -> None:
         try:
             self.config_info = read_yaml_file(config_file_path)
@@ -117,9 +116,12 @@ class Configuration:
                                 model_trainer_info[MODEL_TRAINER_TRAINED_MODEL_DIR_KEY],
                                 model_trainer_info[MODEL_TRAINER_MODEL_FILE_NAME_KEY])
             base_accuracy = model_trainer_info[MODEL_TRAINER_BASE_ACCURACY_KEY]
+            model_config_file_path = os.path.join(model_trainer_info[MODEL_TRAINER_MODEL_CONFIG_DIR_NAME_KEY],
+                                                  model_trainer_info[MODEL_TRAINER_MODEL_CONFIG_FILE_NAME_KEY])
             model_trainer_config = ModelTrainerConfig(
                                     trained_model_file_path= trained_model_file_path,
-                                    base_accuracy= base_accuracy)
+                                    base_accuracy= base_accuracy,
+                                    model_config_file_path=model_config_file_path)
             logging.info(f"Model Trainer Config: {model_trainer_config}")
             return model_trainer_config                 
         except Exception as e:
@@ -131,7 +133,6 @@ class Configuration:
             model_evaluation_info = self.config_info[MODEL_EVALUATION_CONFIG_KEY]
             model_evaluation_file_path = os.path.join(artifact_dir,
                                         MODEL_EVALUATION_ARTIFACT_DIR,
-                                        self.time_stamp,
                                         model_evaluation_info[MODEL_EVALUATION_FILE_NAME_KEY])
             model_evaluation_config = ModelEvaluationConfig(
                                     model_evaluation_file_path=model_evaluation_file_path,
@@ -143,12 +144,11 @@ class Configuration:
 
     def get_model_pusher_config(self)-> ModelPusherConfig:
         try:
-            artifact_dir = self.training_pipeline_config.artifact_dir
+            time_stamp = f"{datetime.now().strftime('%Y%m%d%H%M%S')}"
             model_pusher_info = self.config_info[MODEL_PUSHER_CONFIG_KEY]
-            export_dir_path = os.path.join(artifact_dir,
-                            MODEL_PUSHER_ARTIFACT_DIR,
-                            self.time_stamp,
-                            model_pusher_info[MODEL_PUSHER_EXPORT_DIR_KEY])
+            export_dir_path = os.path.join(ROOT_DIR,
+                                           model_pusher_info[MODEL_PUSHER_EXPORT_DIR_KEY],
+                                           time_stamp)
             model_pusher_config = ModelPusherConfig(export_dir_path= export_dir_path)
             logging.info(f"Model Pusher Config : {model_pusher_config}")
             return model_pusher_config
@@ -159,8 +159,8 @@ class Configuration:
         try:
             training_pipeline_info = self.config_info[TRAINING_PIPELINE_CONFIG_KEY]
             artifact_dir = os.path.join(ROOT_DIR,
-                                    training_pipeline_info[TRAINING_PIPELINE_NAME_KEY],
-                                    training_pipeline_info[TRAINING_PIPELINE_ARTIFACT_DIR_KEY])
+                                        training_pipeline_info[TRAINING_PIPELINE_NAME_KEY],
+                                        training_pipeline_info[TRAINING_PIPELINE_ARTIFACT_DIR_KEY])
             training_pipeline_config = TrainingPipelineConfig(artifact_dir=artifact_dir)
             logging.info(f"Training pipeling config: {training_pipeline_config}")
             return training_pipeline_config
